@@ -410,7 +410,8 @@ class Comment(db.Model):
 
 class Banner(db.Model):
   contents = db.TextProperty()
-
+  created = db.DateTimeProperty(auto_now_add=True)
+  
   MEMCACHE_KEY = 'rendered:banners'
 
   # Warning: using db.put or db.delete won't trigger these memcache flushes!
@@ -420,6 +421,12 @@ class Banner(db.Model):
   def put(self):
     super(Banner, self).put()
     memcache.flush_all()
+
+  def created_display(self):
+    """The date as a displayable string; doesn't need to be escaped.  This
+    is Mystery Hunt, so we can assume Eastern time, and the weekday name
+    is enough to differentiate days."""
+    return datetime_display(self.created)
 
   @classmethod
   def get_rendered(cls):
